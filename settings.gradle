@@ -1,2 +1,2 @@
-include ':app', ':solicitor'
+include ':app', ':solicitor-impl', ':solicitor-core'
 rootProject.name='sample'

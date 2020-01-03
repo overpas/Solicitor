@@ -1,17 +1,21 @@
-package by.overpass.android.solicitor
+package by.overpass.android.solicitor.impl
 
 import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import kotlin.random.Random
+import androidx.fragment.app.FragmentManager
+import by.overpass.android.solicitor.core.PermissionCallbacks
+import by.overpass.android.solicitor.core.PermissionRequest
+import by.overpass.android.solicitor.core.Permissions
 
-typealias Permissions = List<String>
+internal class PermissionRequestImpl : Fragment(), PermissionRequest, PermissionCallbacks {
 
-class Solicitor : Fragment() {
-
-    private var permissionCallbacks: PermissionCallbacks? = null
+    override var onGranted: (Permissions) -> Unit = {}
+    override var onDenied: (Permissions) -> Unit = {}
+    override var onDeniedPermanently: (Permissions) -> Unit = {}
+    override var onShouldShowRationale: (Permissions, () -> Unit) -> Unit =
+        { permissions: Permissions, repeat: () -> Unit -> }
 
     private var showedRationale = false
 
@@ -20,12 +24,12 @@ class Solicitor : Fragment() {
         retainInstance = true
     }
 
-    fun request(vararg permissions: String, requestCode: Int = Random.nextBits(16)) {
+    override fun request(vararg permissions: String, requestCode: Int) {
         val allGranted = permissions.all {
             ContextCompat.checkSelfPermission(requireContext(), it) == GRANTED
         }
         if (allGranted) {
-            permissionCallbacks?.onGranted(permissions.asList())
+            onGranted(permissions.asList())
         } else {
             val permissionsNeedingRationale = mutableListOf<String>()
             val grantedPermissions = mutableListOf<String>()
@@ -42,7 +46,7 @@ class Solicitor : Fragment() {
             }
 
             if (permissionsNeedingRationale.isNotEmpty() && !showedRationale) {
-                permissionCallbacks?.onShouldShowRationale(permissionsNeedingRationale) {
+                onShouldShowRationale(permissionsNeedingRationale) {
                     request(
                         permissions = *permissions,
                         requestCode = requestCode
@@ -84,13 +88,13 @@ class Solicitor : Fragment() {
         val permanentlyDenied = denied - needRationale
         when {
             permanentlyDenied.isNotEmpty() -> {
-                permissionCallbacks?.onDeniedPermanently(permanentlyDenied)
+                onDeniedPermanently(permanentlyDenied)
             }
             denied.isNotEmpty() -> {
-                permissionCallbacks?.onDenied(denied)
+                onDenied(denied)
             }
             granted.isNotEmpty() -> {
-                permissionCallbacks?.onGranted(granted)
+                onGranted(granted)
             }
         }
     }
@@ -100,21 +104,20 @@ class Solicitor : Fragment() {
         private const val TAG = "Solicitor_TAG"
         private const val GRANTED = PackageManager.PERMISSION_GRANTED
 
-        fun <T> of(client: T): Solicitor where T : AppCompatActivity, T : PermissionCallbacks =
-            with(client.supportFragmentManager) {
-                val existing = findFragmentByTag(TAG)
-                if (existing == null || existing !is Solicitor) {
-                    val solicitor = Solicitor()
-                    solicitor.permissionCallbacks = client
-                    beginTransaction()
-                        .add(solicitor, TAG)
-                        .commit()
-                    solicitor
-                } else {
-                    existing.apply {
-                        permissionCallbacks = client
-                    }
-                }
+        internal fun create(
+            fragmentManager: FragmentManager,
+            func: PermissionCallbacks.() -> Unit
+        ): PermissionRequestImpl = with(fragmentManager) {
+            val existing = findFragmentByTag(TAG)
+            if (existing == null || existing !is PermissionRequestImpl) {
+                val solicitor = PermissionRequestImpl()
+                beginTransaction()
+                    .add(solicitor, TAG)
+                    .commitNow()
+                solicitor
+            } else {
+                existing
             }
+        }.apply(func)
     }
 }
