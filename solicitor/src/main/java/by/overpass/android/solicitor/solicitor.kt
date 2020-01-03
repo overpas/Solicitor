@@ -43,7 +43,10 @@ class Solicitor : Fragment() {
 
             if (permissionsNeedingRationale.isNotEmpty() && !showedRationale) {
                 permissionCallbacks?.onShouldShowRationale(permissionsNeedingRationale) {
-                    request(permissions = *permissions, requestCode = requestCode)
+                    request(
+                        permissions = *permissions,
+                        requestCode = requestCode
+                    )
                 }
                 showedRationale = true
             } else if (deniedPermissions.isNotEmpty()) {
