@@ -3,10 +3,7 @@ package by.overpass.android.solicitor.impl
 import by.overpass.android.solicitor.core.PermissionFramework
 import by.overpass.android.solicitor.core.PermissionStatus
 import by.overpass.android.solicitor.core.Permissions
-import com.nhaarman.mockitokotlin2.argForWhich
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
@@ -40,7 +37,7 @@ class PermissionRequestImplSpek : Spek({
 
         describe("GRANTED") {
 
-            it("onGranted callback should be triggered") {
+            it("onGranted callback must be triggered") {
                 whenever(mockPermissionFramework.status(permissions, results))
                     .thenReturn(PermissionStatus(
                         granted = permissions.asList(),
@@ -60,7 +57,7 @@ class PermissionRequestImplSpek : Spek({
 
         describe("DENIED") {
 
-            it("onDenied callback should be triggered") {
+            it("onDenied callback must be triggered") {
                 whenever(mockPermissionFramework.status(permissions, results))
                     .thenReturn(PermissionStatus(
                         granted = emptyList(),
@@ -80,7 +77,7 @@ class PermissionRequestImplSpek : Spek({
 
         describe("DENIED PERMANENTLY") {
 
-            it("onDeniedPermanently callback should be triggered") {
+            it("onDeniedPermanently callback must be triggered") {
                 whenever(mockPermissionFramework.status(permissions, results))
                     .thenReturn(PermissionStatus(
                         granted = emptyList(),
@@ -95,6 +92,36 @@ class PermissionRequestImplSpek : Spek({
                 )
 
                 verify(mockDeniedPermanentlyCallback).invoke(argForWhich { this[0] == "perm1" })
+            }
+        }
+
+        describe("with other request code") {
+
+            it("callbacks mustn't be triggered") {
+                request.onRequestPermissionsResult(
+                    2,
+                    permissions,
+                    results
+                )
+
+                verifyZeroInteractions(mockGrantedCallback)
+                verifyZeroInteractions(mockDeniedCallback)
+                verifyZeroInteractions(mockDeniedPermanentlyCallback)
+            }
+        }
+
+        describe("with inconsistent permissions and results") {
+
+            it("callbacks mustn't be triggered") {
+                request.onRequestPermissionsResult(
+                    theRequestCode,
+                    permissions,
+                    intArrayOf()
+                )
+
+                verifyZeroInteractions(mockGrantedCallback)
+                verifyZeroInteractions(mockDeniedCallback)
+                verifyZeroInteractions(mockDeniedPermanentlyCallback)
             }
         }
     }

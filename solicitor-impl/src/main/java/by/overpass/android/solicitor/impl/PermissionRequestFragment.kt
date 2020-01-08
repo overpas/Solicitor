@@ -28,6 +28,18 @@ internal class PermissionRequestFragment : Fragment(), PermissionRequest, Permis
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
+        savedInstanceState?.apply {
+            showedRationale = getBoolean(EXTRA_SHOWED_RATIONALE, false)
+            requestCode = getInt(EXTRA_REQUEST_CODE, -1)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.apply {
+            putBoolean(EXTRA_SHOWED_RATIONALE, showedRationale)
+            putInt(EXTRA_REQUEST_CODE, requestCode)
+        }
+        super.onSaveInstanceState(outState)
     }
 
     override fun request(vararg permissions: String, requestCode: Int) {
@@ -81,6 +93,8 @@ internal class PermissionRequestFragment : Fragment(), PermissionRequest, Permis
 
     companion object {
 
+        private const val EXTRA_SHOWED_RATIONALE = "extra_showed_rationale"
+        private const val EXTRA_REQUEST_CODE = "extra_request_code"
         private const val TAG = "Solicitor_TAG"
 
         internal fun create(
