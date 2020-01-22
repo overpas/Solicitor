@@ -70,8 +70,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         textView.setOnClickListener {
             request.request(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                permissions = arrayOf(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
             )
         }
     }

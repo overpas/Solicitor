@@ -42,7 +42,7 @@ internal class PermissionRequestFragment : Fragment(), PermissionRequest, Permis
         super.onSaveInstanceState(outState)
     }
 
-    override fun request(vararg permissions: String, requestCode: Int) {
+    override fun request(requestCode: Int, permissions: Array<out String>) {
         this.requestCode = requestCode
         if (permissionFramework.allGranted(permissions)) {
             onGranted(permissions.asList())
@@ -51,10 +51,7 @@ internal class PermissionRequestFragment : Fragment(), PermissionRequest, Permis
 
             if (needRationale.isNotEmpty() && !showedRationale) {
                 onShouldShowRationale(needRationale) {
-                    request(
-                        permissions = *permissions,
-                        requestCode = requestCode
-                    )
+                    request(requestCode, permissions)
                 }
                 showedRationale = true
             } else if (denied.isNotEmpty()) {
