@@ -155,7 +155,7 @@ class PermissionRequestImplSpek : Spek({
             beforeEachTest {
                 whenever(mockPermissionFramework.allGranted(permissions)).thenReturn(true)
 
-                request.request(*permissions, requestCode = requestCode)
+                request.request(requestCode, permissions)
             }
 
             it("onGranted callback must be triggered") {
@@ -179,7 +179,7 @@ class PermissionRequestImplSpek : Spek({
                         )
                     )
 
-                request.request(*permissions, requestCode = requestCode)
+                request.request(requestCode, permissions)
             }
 
             it("permissions must be requested") {
@@ -203,7 +203,7 @@ class PermissionRequestImplSpek : Spek({
                         )
                     )
 
-                request.request(*permissions, requestCode = requestCode)
+                request.request(requestCode, permissions)
             }
 
             it("onShouldShowRationaleCallback must be triggered") {
