@@ -102,15 +102,14 @@ internal class PermissionRequestFragment : Fragment(), PermissionRequest, Permis
             func: PermissionCallbacks.() -> Unit
         ): PermissionRequestFragment = create({
             with(fragmentManager) {
-                val existing = findFragmentByTag(TAG)
-                if (existing == null || existing !is PermissionRequestFragment) {
-                    val solicitor = PermissionRequestFragment()
-                    beginTransaction()
-                        .add(solicitor, TAG)
-                        .commitNow()
-                    solicitor
-                } else {
-                    existing
+                with(findFragmentByTag(TAG)) {
+                    if (this == null || this !is PermissionRequestFragment) {
+                        PermissionRequestFragment().also {
+                            beginTransaction()
+                                .add(it, TAG)
+                                .commitNow()
+                        }
+                    } else this
                 }
             }
         }, func)

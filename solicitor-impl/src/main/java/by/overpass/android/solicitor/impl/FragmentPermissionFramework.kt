@@ -10,8 +10,9 @@ internal class FragmentPermissionFramework(
     private val fragment: Fragment
 ) : PermissionFramework {
 
-    override fun requestPermissions(permissions: Array<out String>, requestCode: Int) =
+    override fun requestPermissions(permissions: Array<out String>, requestCode: Int) {
         fragment.requestPermissions(permissions, requestCode)
+    }
 
     override fun allGranted(permissions: Array<out String>): Boolean = permissions.all {
         isGranted(it)
