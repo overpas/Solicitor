@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import by.overpass.android.solicitor.core.Permissions
@@ -16,18 +15,10 @@ class MainActivity : AppCompatActivity() {
 
     private val request by request {
         onGranted = {
-            Toast.makeText(
-                this@MainActivity,
-                "GRANTED: ${it.print()}",
-                Toast.LENGTH_SHORT
-            ).show()
+            message.text = "GRANTED: ${it.print()}"
         }
         onDenied = {
-            Toast.makeText(
-                this@MainActivity,
-                "DENIED: ${it.print()}",
-                Toast.LENGTH_SHORT
-            ).show()
+            message.text = "DENIED: ${it.print()}"
         }
         onDeniedPermanently = {
             AlertDialog.Builder(this@MainActivity)
@@ -54,11 +45,7 @@ class MainActivity : AppCompatActivity() {
                     repeat()
                 }
                 .setNegativeButton("NO") { a, b ->
-                    Toast.makeText(
-                        this@MainActivity,
-                        "THE APP WILL NOT WORK WITHOUT PERMISSIONS",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    message.text = "THE APP WILL NOT WORK WITHOUT PERMISSIONS"
                 }
                 .create()
                 .show()
@@ -68,7 +55,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        textView.setOnClickListener {
+        requestPermissions.setOnClickListener {
             request.request(
                 permissions = arrayOf(
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
