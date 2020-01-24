@@ -10,6 +10,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiObjectNotFoundException
 import androidx.test.uiautomator.UiSelector
 import org.hamcrest.Matchers.containsString
 import org.junit.Before
@@ -35,25 +36,39 @@ class MainActivityTest {
 
     @Test
     fun testAllPermissionsGranted() {
-        uiDevice.findObject(By.res(Constants.MY_PKG, "requestPermissions")).click()
+        uiDevice.findObject(By.res(Constants.PKG_MY_APP, "requestPermissions")).click()
+
+        try {
+            uiDevice.findObject(
+                UiSelector()
+                    .packageName(Constants.PKG_PERMISSION_CONTROLLER)
+                    .childSelector(
+                        UiSelector()
+                            .className(Constants.CLASS_BUTTON)
+                            .resourceId(Constants.RES_ALLOW_FG_ONLY_BUTTON)
+                    )
+            ).click()
+        } catch (e: UiObjectNotFoundException) {
+            println("[ERROR] No UIObject with resId = ${Constants.RES_ALLOW_FG_ONLY_BUTTON}")
+
+            uiDevice.findObject(
+                UiSelector()
+                    .packageName(Constants.PKG_PERMISSION_CONTROLLER)
+                    .childSelector(
+                        UiSelector()
+                            .className(Constants.CLASS_BUTTON)
+                            .resourceId(Constants.RES_ALLOW_BUTTON)
+                    )
+            ).click()
+        }
 
         uiDevice.findObject(
             UiSelector()
-                .packageName("com.google.android.permissioncontroller")
+                .packageName(Constants.PKG_PERMISSION_CONTROLLER)
                 .childSelector(
                     UiSelector()
-                        .className("android.widget.Button")
-                        .resourceId("com.android.permissioncontroller:id/permission_allow_foreground_only_button")
-                )
-        ).click()
-
-        uiDevice.findObject(
-            UiSelector()
-                .packageName("com.google.android.permissioncontroller")
-                .childSelector(
-                    UiSelector()
-                        .className("android.widget.Button")
-                        .resourceId("com.android.permissioncontroller:id/permission_allow_button")
+                        .className(Constants.CLASS_BUTTON)
+                        .resourceId(Constants.RES_ALLOW_BUTTON)
                 )
         ).click()
 
@@ -61,6 +76,10 @@ class MainActivityTest {
     }
 
     object Constants {
-        const val MY_PKG = "by.overpass.android.solicitor.sample"
+        const val PKG_MY_APP = "by.overpass.android.solicitor.sample"
+        const val PKG_PERMISSION_CONTROLLER = "com.google.android.permissioncontroller"
+        const val CLASS_BUTTON = "android.widget.Button"
+        const val RES_ALLOW_BUTTON = "com.android.permissioncontroller:id/permission_allow_button"
+        const val RES_ALLOW_FG_ONLY_BUTTON = "com.android.permissioncontroller:id/permission_allow_foreground_only_button"
     }
 }
