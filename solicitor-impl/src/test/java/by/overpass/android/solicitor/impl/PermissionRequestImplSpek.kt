@@ -50,15 +50,15 @@ class PermissionRequestImplSpek : Spek({
                             needRationale = emptyList()
                         )
                     )
+            }
 
+            it("onGranted callback must be triggered") {
                 request.onRequestPermissionsResult(
                     theRequestCode,
                     permissions,
                     results
                 )
-            }
 
-            it("onGranted callback must be triggered") {
                 verify(mockGrantedCallback).invoke(argForWhich { this[0] == "perm1" })
             }
         }
@@ -74,15 +74,15 @@ class PermissionRequestImplSpek : Spek({
                             needRationale = permissions.asList()
                         )
                     )
+            }
 
+            it("onDenied callback must be triggered") {
                 request.onRequestPermissionsResult(
                     theRequestCode,
                     permissions,
                     results
                 )
-            }
 
-            it("onDenied callback must be triggered") {
                 verify(mockDeniedCallback).invoke(argForWhich { this[0] == "perm1" })
             }
         }
@@ -98,30 +98,28 @@ class PermissionRequestImplSpek : Spek({
                             needRationale = emptyList()
                         )
                     )
+            }
 
+            it("onDeniedPermanently callback must be triggered") {
                 request.onRequestPermissionsResult(
                     theRequestCode,
                     permissions,
                     results
                 )
-            }
 
-            it("onDeniedPermanently callback must be triggered") {
                 verify(mockDeniedPermanentlyCallback).invoke(argForWhich { this[0] == "perm1" })
             }
         }
 
         describe("with other request code") {
 
-            beforeEachTest {
+            it("callbacks mustn't be triggered") {
                 request.onRequestPermissionsResult(
                     2,
                     permissions,
                     results
                 )
-            }
 
-            it("callbacks mustn't be triggered") {
                 verifyZeroInteractions(mockGrantedCallback)
                 verifyZeroInteractions(mockDeniedCallback)
                 verifyZeroInteractions(mockDeniedPermanentlyCallback)
@@ -130,15 +128,13 @@ class PermissionRequestImplSpek : Spek({
 
         describe("with inconsistent permissions and results") {
 
-            beforeEachTest {
+            it("callbacks mustn't be triggered") {
                 request.onRequestPermissionsResult(
                     theRequestCode,
                     permissions,
                     intArrayOf()
                 )
-            }
 
-            it("callbacks mustn't be triggered") {
                 verifyZeroInteractions(mockGrantedCallback)
                 verifyZeroInteractions(mockDeniedCallback)
                 verifyZeroInteractions(mockDeniedPermanentlyCallback)
@@ -150,70 +146,68 @@ class PermissionRequestImplSpek : Spek({
 
         val requestCode = 2
 
-        describe("if all permissions already granted") {
+        describe("with request code") {
 
-            beforeEachTest {
-                whenever(mockPermissionFramework.allGranted(permissions)).thenReturn(true)
+            val requestCodeSetDescription = "request code must be set,"
 
-                request.request(requestCode, permissions)
+            describe("if all permissions already granted") {
+
+                beforeEachTest {
+                    whenever(mockPermissionFramework.allGranted(permissions)).thenReturn(true)
+                }
+
+                it("$requestCodeSetDescription onGranted callback must be triggered") {
+                    request.request(requestCode, permissions)
+
+                    verify(mockGrantedCallback).invoke(argForWhich { this[0] == "perm1" })
+                    assertEquals(requestCode, request.requestCode)
+                }
             }
 
-            it("onGranted callback must be triggered") {
-                verify(mockGrantedCallback).invoke(argForWhich { this[0] == "perm1" })
-            }
-            it("requestCode must be set") {
-                assertEquals(requestCode, request.requestCode)
-            }
-        }
+            describe("if permissions are not granted, no permissions need rationale and some are denied") {
 
-        describe("if permissions are not granted, no permissions need rationale and some are denied") {
-
-            beforeEachTest {
-                whenever(mockPermissionFramework.allGranted(permissions)).thenReturn(false)
-                whenever(mockPermissionFramework.status(permissions))
-                    .thenReturn(
-                        PermissionStatus(
-                            emptyList(),
-                            permissions.asList(),
-                            emptyList()
+                beforeEachTest {
+                    whenever(mockPermissionFramework.allGranted(permissions)).thenReturn(false)
+                    whenever(mockPermissionFramework.status(permissions))
+                        .thenReturn(
+                            PermissionStatus(
+                                emptyList(),
+                                permissions.asList(),
+                                emptyList()
+                            )
                         )
-                    )
+                }
 
-                request.request(requestCode, permissions)
+                it("$requestCodeSetDescription permissions must be requested") {
+                    request.request(requestCode, permissions)
+
+                    verify(mockPermissionFramework).requestPermissions(permissions, requestCode)
+                    assertEquals(requestCode, request.requestCode)
+                }
             }
 
-            it("permissions must be requested") {
-                verify(mockPermissionFramework).requestPermissions(permissions, requestCode)
-            }
-            it("requestCode must be set") {
-                assertEquals(requestCode, request.requestCode)
-            }
-        }
+            describe("if permissions are not granted, some permissions need rationale") {
 
-        describe("if permissions are not granted, some permissions need rationale") {
-
-            beforeEachTest {
-                whenever(mockPermissionFramework.allGranted(permissions)).thenReturn(false)
-                whenever(mockPermissionFramework.status(permissions))
-                    .thenReturn(
-                        PermissionStatus(
-                            emptyList(),
-                            emptyList(),
-                            permissions.asList()
+                beforeEachTest {
+                    whenever(mockPermissionFramework.allGranted(permissions)).thenReturn(false)
+                    whenever(mockPermissionFramework.status(permissions))
+                        .thenReturn(
+                            PermissionStatus(
+                                emptyList(),
+                                emptyList(),
+                                permissions.asList()
+                            )
                         )
-                    )
+                }
 
-                request.request(requestCode, permissions)
-            }
+                it("$requestCodeSetDescription onShouldShowRationaleCallback must be" +
+                        " triggered and showedRationale must be set to true") {
+                    request.request(requestCode, permissions)
 
-            it("onShouldShowRationaleCallback must be triggered") {
-                verify(mockRationaleCallback).invoke(argThat { this[0] == "perm1" }, any())
-            }
-            it("showedRationale property must be set to true") {
-                assertTrue(request.showedRationale)
-            }
-            it("requestCode must be set") {
-                assertEquals(requestCode, request.requestCode)
+                    verify(mockRationaleCallback).invoke(argThat { this[0] == "perm1" }, any())
+                    assertTrue(request.showedRationale)
+                    assertEquals(requestCode, request.requestCode)
+                }
             }
         }
     }
