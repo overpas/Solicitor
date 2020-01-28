@@ -6,10 +6,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import by.overpass.android.solicitor.core.PermissionCallbacks
 import by.overpass.android.solicitor.core.PermissionFramework
-import by.overpass.android.solicitor.core.PermissionRequest
+import by.overpass.android.solicitor.core.PermissionRequestScope
 import by.overpass.android.solicitor.core.Permissions
 
-internal class PermissionRequestFragment : Fragment(), PermissionRequest, PermissionCallbacks {
+internal class PermissionRequestFragment : Fragment(), PermissionCallbacks, PermissionRequestScope {
 
     override var onGranted: (Permissions) -> Unit = {}
     override var onDenied: (Permissions) -> Unit = {}
@@ -17,17 +17,17 @@ internal class PermissionRequestFragment : Fragment(), PermissionRequest, Permis
     override var onShouldShowRationale: (Permissions, () -> Unit) -> Unit =
         { permissions: Permissions, repeat: () -> Unit -> }
 
-    @VisibleForTesting
-    internal lateinit var permissionFramework: PermissionFramework
-
-    @VisibleForTesting
-    internal var showedRationale = false
-    @VisibleForTesting
-    internal var requestCode = -1
+    override var permissionFramework: PermissionFramework = UninitializedPermissionFramework()
+    override var showedRationale = false
+    override var requestCode = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
         savedInstanceState?.apply {
             showedRationale = getBoolean(EXTRA_SHOWED_RATIONALE, false)
             requestCode = getInt(EXTRA_REQUEST_CODE, -1)
@@ -117,7 +117,7 @@ internal class PermissionRequestFragment : Fragment(), PermissionRequest, Permis
             func: PermissionCallbacks.() -> Unit
         ): PermissionRequestFragment = createFragment()
             .apply {
-                permissionFramework = FragmentPermissionFramework(this)
+                permissionFramework = Solicitor.permissionFrameworkFactory.invoke(this)
             }
             .apply(func)
     }

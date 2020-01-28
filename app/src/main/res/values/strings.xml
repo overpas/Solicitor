@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Solicitor Sample</string>
+    <string name="rationale_dismissed">THE APP WILL NOT WORK WITHOUT PERMISSIONS</string>
 </resources>

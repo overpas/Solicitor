@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                     repeat()
                 }
                 .setNegativeButton("NO") { a, b ->
-                    message.text = "THE APP WILL NOT WORK WITHOUT PERMISSIONS"
+                    message.setText(R.string.rationale_dismissed)
                 }
                 .create()
                 .show()
