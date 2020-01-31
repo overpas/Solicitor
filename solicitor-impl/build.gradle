@@ -61,3 +61,12 @@ dependencies {
 }
 
 fileTree(include: ['*.gradle'], dir: 'gradle-scripts').each { apply from: it }
+
+task sources(type: Jar) {
+    archiveClassifier.set('sources')
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives sources
+}
