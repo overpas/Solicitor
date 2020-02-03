@@ -1,9 +1,10 @@
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.github.overpas.Solicitor'
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: "de.mannodermaus.android-junit5"
-apply plugin: 'com.github.dcendents.android-maven'
-
-group='com.github.overpas'
 
 android {
     compileSdkVersion 29
