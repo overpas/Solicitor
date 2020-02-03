@@ -18,14 +18,14 @@ internal class FragmentPermissionFramework(
         isGranted(it)
     }
 
-    override fun status(permissions: Array<out String>): PermissionStatus = status(permissions) {
+    override fun checkStatus(permissions: Array<out String>): PermissionStatus = getStatus(permissions) {
         isGranted(it)
     }
 
-    override fun status(
+    override fun parseStatus(
         permissions: Array<out String>,
         grantResults: IntArray
-    ): PermissionStatus = status(permissions) {
+    ): PermissionStatus = getStatus(permissions) {
         grantResults[permissions.indexOf(it)] == GRANTED
     }
 
@@ -34,7 +34,7 @@ internal class FragmentPermissionFramework(
         permission
     ) == GRANTED
 
-    private fun status(
+    private fun getStatus(
         permissions: Array<out String>,
         isGranted: (String) -> Boolean
     ): PermissionStatus {

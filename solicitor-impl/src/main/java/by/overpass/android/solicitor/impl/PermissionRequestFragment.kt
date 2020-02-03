@@ -9,6 +9,10 @@ import by.overpass.android.solicitor.core.PermissionFramework
 import by.overpass.android.solicitor.core.PermissionRequestScope
 import by.overpass.android.solicitor.core.Permissions
 
+/**
+ * A [PermissionRequestScope] implementation based on [Fragment]. Extending [Fragment] is convenient
+ * because a [Fragment] has a lifecycle and can retain its instance across configuration changes
+ */
 internal class PermissionRequestFragment : Fragment(), PermissionCallbacks, PermissionRequestScope {
 
     override var onGranted: (Permissions) -> Unit = {}
@@ -47,7 +51,7 @@ internal class PermissionRequestFragment : Fragment(), PermissionCallbacks, Perm
         if (permissionFramework.allGranted(permissions)) {
             onGranted(permissions.asList())
         } else {
-            val (_, denied, needRationale) = permissionFramework.status(permissions)
+            val (_, denied, needRationale) = permissionFramework.checkStatus(permissions)
 
             if (needRationale.isNotEmpty() && !showedRationale) {
                 onShouldShowRationale(needRationale) {
@@ -72,7 +76,7 @@ internal class PermissionRequestFragment : Fragment(), PermissionCallbacks, Perm
         if (permissions.size != grantResults.size) return
         if (requestCode != this.requestCode || requestCode == -1) return
 
-        val (granted, denied, needRationale) = permissionFramework.status(permissions, grantResults)
+        val (granted, denied, needRationale) = permissionFramework.parseStatus(permissions, grantResults)
 
         val permanentlyDenied = denied - needRationale
         when {

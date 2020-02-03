@@ -115,7 +115,7 @@ class MainActivityTest {
     @Test
     fun testRationaleNeeded() {
         `when`(mockPermissionFramework.allGranted(any())).thenReturn(false)
-        `when`(mockPermissionFramework.status(any())).thenReturn(
+        `when`(mockPermissionFramework.checkStatus(any())).thenReturn(
             PermissionStatus(
                 emptyList(),
                 emptyList(),
@@ -152,7 +152,7 @@ class MainActivityTest {
     @Test
     fun testRationaleDismissed() {
         `when`(mockPermissionFramework.allGranted(any())).thenReturn(false)
-        `when`(mockPermissionFramework.status(any())).thenReturn(
+        `when`(mockPermissionFramework.checkStatus(any())).thenReturn(
             PermissionStatus(
                 emptyList(),
                 emptyList(),

@@ -42,7 +42,7 @@ class PermissionRequestImplSpek : Spek({
         describe("GRANTED") {
 
             beforeEachTest {
-                whenever(mockPermissionFramework.status(permissions, results))
+                whenever(mockPermissionFramework.parseStatus(permissions, results))
                     .thenReturn(
                         PermissionStatus(
                             granted = permissions.asList(),
@@ -66,7 +66,7 @@ class PermissionRequestImplSpek : Spek({
         describe("DENIED") {
 
             beforeEachTest {
-                whenever(mockPermissionFramework.status(permissions, results))
+                whenever(mockPermissionFramework.parseStatus(permissions, results))
                     .thenReturn(
                         PermissionStatus(
                             granted = emptyList(),
@@ -90,7 +90,7 @@ class PermissionRequestImplSpek : Spek({
         describe("DENIED PERMANENTLY") {
 
             beforeEachTest {
-                whenever(mockPermissionFramework.status(permissions, results))
+                whenever(mockPermissionFramework.parseStatus(permissions, results))
                     .thenReturn(
                         PermissionStatus(
                             granted = emptyList(),
@@ -168,7 +168,7 @@ class PermissionRequestImplSpek : Spek({
 
                 beforeEachTest {
                     whenever(mockPermissionFramework.allGranted(permissions)).thenReturn(false)
-                    whenever(mockPermissionFramework.status(permissions))
+                    whenever(mockPermissionFramework.checkStatus(permissions))
                         .thenReturn(
                             PermissionStatus(
                                 emptyList(),
@@ -190,7 +190,7 @@ class PermissionRequestImplSpek : Spek({
 
                 beforeEachTest {
                     whenever(mockPermissionFramework.allGranted(permissions)).thenReturn(false)
-                    whenever(mockPermissionFramework.status(permissions))
+                    whenever(mockPermissionFramework.checkStatus(permissions))
                         .thenReturn(
                             PermissionStatus(
                                 emptyList(),
